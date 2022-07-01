@@ -1,0 +1,32 @@
+[
+  {
+    "profilePicture": "",
+    "coverPicture": "",
+    "followers": [],
+    "followings": [],
+    "isAdmin": false,
+    "username": "trungky",
+    "email": "trungky@gmail.com",
+    "password": "12345"
+  },
+  {
+    "profilePicture": "",
+    "coverPicture": "",
+    "followers": [],
+    "followings": [],
+    "isAdmin": false,
+    "username": "trungkypham",
+    "email": "trungkypham@gmail.com",
+    "password": "12345"
+  },
+  {
+    "profilePicture": "",
+    "coverPicture": "",
+    "followers": [],
+    "followings": [],
+    "isAdmin": false,
+    "username": "kyphamonthego",
+    "email": "kyphamonthego@gmail.com",
+    "password": "12345"
+  }
+]
