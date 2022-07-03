@@ -6,22 +6,38 @@ const PostSchema = new mongoose.Schema(
       type: String,
       // required: true,
     },
-    desc: {
+    name: {
       type: String,
-      max: 500,
-    },
-    img: {
-      type: String,
-    },
-    avatar: {
-      type: String,
+      max: 50,
       default: "",
     },
+    description: {
+      type: String,
+      max: 500,
+      default: "",
+    },
+    image: {
+      data: Buffer,
+      contentType: String,
+    },
+    avatar: {
+      data: Buffer,
+      contentType: String,
+    },
     likes: {
-      type: Array,
-      default: [],
+      type: Number,
+      default: 0,
       required: true,
     },
+    comment: [
+      {
+        content: String,
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

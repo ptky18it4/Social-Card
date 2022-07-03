@@ -40,5 +40,5 @@ app.use("/api/users", userRoute);
 app.use("/api/posts", postRoute);
 
 app.listen(8800, () => {
-  console.log(`Backend server is running! http://localhost:8800/api/`);
+  console.log(`Backend server is running! http://192.168.0.119:8800/api/`);
 });
