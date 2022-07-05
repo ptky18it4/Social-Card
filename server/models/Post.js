@@ -1,29 +1,45 @@
 const mongoose = require("mongoose");
-
+const mongooseDelete = require("mongoose-delete");
 const PostSchema = new mongoose.Schema(
   {
     userId: {
       type: String,
       // required: true,
     },
-    desc: {
+    name: {
+      type: String,
+      max: 50,
+      default: "",
+    },
+    description: {
       type: String,
       max: 500,
+      default: "",
     },
-    img: {
+    image: {
       type: String,
     },
     avatar: {
       type: String,
-      default: "",
     },
     likes: {
-      type: Array,
-      default: [],
+      type: Number,
+      default: 0,
       required: true,
     },
+    comment: [
+      {
+        content: String,
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
-
+PostSchema.plugin(mongooseDelete, {
+  deletedAt: true,
+});
 module.exports = mongoose.model("Post", PostSchema);
