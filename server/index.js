@@ -1,4 +1,6 @@
 const express = require("express");
+// const socketIo = require("socket.io");
+// const http = require("http");
 const app = express();
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
@@ -41,6 +43,31 @@ app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/posts", postRoute);
 
+// Socket.io
+// const server = http.createServer(app);
+// const io = socketIo(server);
+
+// let interval;
+
+// io.on("connection", (socket) => {
+//   console.log("New client connected");
+//   if (interval) {
+//     clearInterval(interval);
+//   }
+//   interval = setInterval(() => getApiAndEmit(socket), 1000);
+//   socket.on("disconnect", () => {
+//     console.log("Client disconnected");
+//     clearInterval(interval);
+//   });
+// });
+
+// const getApiAndEmit = (socket) => {
+//   const response = new Date();
+//   // Emitting a new message. Will be consumed by the client
+//   socket.emit("FromAPI", response);
+// };
+
+// End socket.io
 app.listen(8800, () => {
   console.log(`Backend server is running! http://192.168.0.119:8800/api/`);
 });
