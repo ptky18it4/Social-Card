@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const mongooseDelete = require("mongoose-delete");
 const PostSchema = new mongoose.Schema(
   {
     userId: {
@@ -17,12 +17,10 @@ const PostSchema = new mongoose.Schema(
       default: "",
     },
     image: {
-      data: Buffer,
-      contentType: String,
+      type: String,
     },
     avatar: {
-      data: Buffer,
-      contentType: String,
+      type: String,
     },
     likes: {
       type: Number,
@@ -41,5 +39,7 @@ const PostSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
+PostSchema.plugin(mongooseDelete, {
+  deletedAt: true,
+});
 module.exports = mongoose.model("Post", PostSchema);

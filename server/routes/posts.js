@@ -21,21 +21,14 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage: storage });
-//create a post
-router.post("/", upload.any(), async (req, res, next) => {
-  // const file = req.file;
-  // if (!file) {
-  //   const error = new Error("Please upload a file");
-  //   return next(error);
-  // } else {
-  //   res.send("Upload success");
-  // }
 
+//create a post
+router.post("/", async (req, res, next) => {
   const newPost = new Post({
+    avatar: req.body.avatar,
     name: req.body.name,
     description: req.body.description,
-    image: urlImage,
-    avatar: urlImage,
+    image: req.body.image,
   });
 
   try {
@@ -48,7 +41,6 @@ router.post("/", upload.any(), async (req, res, next) => {
 
 //update a post
 router.put("/:id", async (req, res) => {
-  console.log("DATA: ", req.body.content);
   try {
     const post = await Post.findById(req.params.id);
     // if (post.userId === req.body.userId) {
@@ -80,12 +72,23 @@ router.delete("/:id", async (req, res) => {
   if (req.params.id) {
     try {
       // const post = await Post.findById(req.params.id);
-      await Post.findOneAndDelete({ _id: req.params.id });
+      await Post.delete({ _id: req.params.id });
       res.status(200).json("The post has been deleted");
     } catch (err) {
-      console.log("ERROR: ", err);
       res.status(500).json(err);
     }
+  }
+});
+
+router.patch("/", async (req, res) => {
+  try {
+    // const post = await Post.findById(req.params.id);
+    const post = await Post.findOne().sort({ deletedAt: -1 }).limit(1);
+    await post.restore();
+    // res.status(200).json("The post has been deleted");
+    res.status(200).json(post);
+  } catch (err) {
+    res.status(500).json(err);
   }
 });
 

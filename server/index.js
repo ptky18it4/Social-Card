@@ -5,15 +5,17 @@ const dotenv = require("dotenv");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
-const bodyparser = require("body-parser");
-const multer = require("multer");
-const upload = multer({ dest: "uploads" });
+const bodyParser = require("body-parser");
+
+// app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(bodyParser.json({ limit: "50mb" }));
 app.use(
-  bodyparser.urlencoded({
-    extends: true,
+  bodyParser.urlencoded({
+    limit: "50mb",
+    extended: true,
+    parameterLimit: 50000,
   })
 );
-
 const userRoute = require("./routes/users");
 const authRoute = require("./routes/auth");
 const postRoute = require("./routes/posts");
