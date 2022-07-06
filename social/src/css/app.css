@@ -369,6 +369,7 @@ body .btn {
   top: 22px;
   left: 30px;
   border-radius: 100rem;
+  object-fit: cover;
 }
 .item-top .post-copyright {
   display: flex;

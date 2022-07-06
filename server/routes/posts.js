@@ -1,26 +1,6 @@
 const router = require("express").Router();
 const Post = require("../models/Post");
 const User = require("../models/User");
-const multer = require("multer");
-let urlImage;
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    if (
-      file.mimetype === "image/jpg" ||
-      file.mimetype === "image/jpeg" ||
-      file.mimetype === "image/png"
-    ) {
-      cb(null, "uploads");
-    } else {
-      cb(new Error("not image"), false);
-    }
-  },
-  filename: function (req, file, cb) {
-    urlImage = Date.now() + ".jpg";
-    cb(null, urlImage);
-  },
-});
-const upload = multer({ storage: storage });
 
 //create a post
 router.post("/", async (req, res, next) => {
@@ -51,11 +31,15 @@ router.put("/:id", async (req, res) => {
           comment: [{ content: req.body.content }],
         },
       });
+      // const posts = await Post.find({});
+      // res.status(200).json(posts);
       res.status(200).json("the post has been updated");
     } else {
       await post.updateOne({
         $set: req.body,
       });
+      // const posts = await Post.find({});
+      // res.status(200).json(posts);
       res.status(200).json("the post has been updated");
     }
 
@@ -80,13 +64,14 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+//revert
 router.patch("/", async (req, res) => {
   try {
-    // const post = await Post.findById(req.params.id);
     const post = await Post.findOne().sort({ deletedAt: -1 }).limit(1);
     await post.restore();
-    // res.status(200).json("The post has been deleted");
-    res.status(200).json(post);
+    res.status(200).json("The post has been deleted");
+    // const posts = await Post.find({});
+    // res.status(200).json(posts);
   } catch (err) {
     res.status(500).json(err);
   }

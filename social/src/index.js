@@ -7,6 +7,7 @@ import reportWebVitals from "./reportWebVitals";
 import "./index.css";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import PostDetail from "./features/posts/PostDetail";
+import Test from "./features/posts/Test";
 
 const container = document.getElementById("root");
 const root = createRoot(container);
@@ -17,6 +18,7 @@ root.render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<App />} />
+          <Route path="/test" element={<Test />} />
           <Route path="/detail/:id" element={<PostDetail />} />
         </Routes>
       </BrowserRouter>

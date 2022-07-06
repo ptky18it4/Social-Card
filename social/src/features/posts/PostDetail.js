@@ -9,11 +9,12 @@ import IconHeart from "../../images/heart-solid.svg";
 import IconMessage from "../../images/message-solid.svg";
 import Comment from "./components/Comment";
 import { useParams } from "react-router-dom";
+import { findPostById } from "./postSlice";
 import {
-  findPostById,
+  getAllPostAsync,
   getPostByIdAsync,
   updatePostByIdAsync,
-} from "./postSlice";
+} from "../api/ActionPostAsync";
 import { format } from "date-format-parse";
 import { useDispatch, useSelector } from "react-redux";
 

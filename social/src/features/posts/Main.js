@@ -1,11 +1,8 @@
-import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 import Empty from "./components/Empty";
-import Nav from "./Nav";
 import PostItem from "./components/PostItem";
-import PostDetail from "./PostDetail";
-import { useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { findAllPosts, findSearchList, getAllPostAsync } from "./postSlice";
+import Nav from "./Nav";
+import { findAllPosts, findSearchList } from "./postSlice";
 const Main = () => {
   const posts = useSelector(findAllPosts);
   const searchs = useSelector(findSearchList);

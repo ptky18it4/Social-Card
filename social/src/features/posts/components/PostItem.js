@@ -11,18 +11,19 @@ import Modal from "@mui/material/Modal";
 import UploadImage from "../../../images/upload-solid-blue.svg";
 import { format } from "date-format-parse";
 import axios from "axios";
+import { deletePost } from "../postSlice";
 import {
-  deletePost,
   deletePostAsync,
   getAllPostAsync,
   updatePostByIdAsync,
-} from "../postSlice";
+} from "../../api/ActionPostAsync";
 import { useDispatch } from "react-redux";
 // web.cjs is required for IE11 support
 import { useSpring, animated } from "react-spring";
 import { Link } from "react-router-dom";
 import { validateCreatePost } from "../../helper/validate";
 import { toBase64 } from "../../helper/toBase64";
+import { CircularProgress } from "@mui/material";
 
 const Fade = React.forwardRef(function Fade(props, ref) {
   const { in: open, children, onEnter, onExited, ...other } = props;
@@ -91,10 +92,11 @@ const PostItem = ({
 }) => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [alertDelete, setAlertDelete] = useState(false);
   const [nameUpdate, setNameUpdate] = useState(name);
   const [descriptionUpdate, setDescriptionUpdate] = useState(description);
-  const [selectedAvatarUpdate, setSelectedAvatarUpdate] = useState();
+  const [selectedAvatarUpdate, setSelectedAvatarUpdate] = useState(avatar);
   useState();
   const [isAvatarPickedUpdate, setIsAvatarPickedUpdate] = useState(false);
   const [selectedImageUpdate, setSelectedImageUpdate] = useState();
@@ -147,36 +149,63 @@ const PostItem = ({
     ) {
       alert("Bạn trẻ vui lòng nhập đầy đủ hộ tôi 😜");
     } else {
-      // alert("OKE RỒI NHEN BẠN TRẺ 😜");
-      const [resAvatar, resImage] = await Promise.all([
-        axios.post(
-          "https://api.cloudinary.com/v1_1/fast-boy-reliable/upload",
-          formDataAvatar,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        ),
-        axios.post(
-          "https://api.cloudinary.com/v1_1/fast-boy-reliable/upload",
-          formDataImage,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        ),
-      ]);
-      dispatch(
-        updatePostByIdAsync({
-          id: id,
-          avatar: resAvatar.data.url,
-          name: nameUpdate,
-          description: descriptionUpdate,
-          image: resImage.data.url,
-        })
-      );
+      alert("OKE RỒI NHEN BẠN TRẺ 😜");
+      if (isAvatarPickedUpdate || isImagePickedUpdate) {
+        try {
+          setIsLoading(true);
+          const resImage = await axios
+            .post(
+              "https://api.cloudinary.com/v1_1/fast-boy-reliable/upload",
+              formDataImage,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            )
+            .catch((e) => {
+              console.error("Error upload image: ", e);
+            });
+
+          const resAvatar = await axios
+            .post(
+              "https://api.cloudinary.com/v1_1/fast-boy-reliable/upload",
+              formDataAvatar,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            )
+            .catch((e) => {
+              console.error("Error upload avatar: ", e);
+            });
+          dispatch(
+            updatePostByIdAsync({
+              id: id,
+              avatar: resAvatar ? resAvatar.data.url : "",
+              name: nameUpdate,
+              description: descriptionUpdate,
+              image: resImage ? resImage.data.url : "",
+            })
+          );
+        } catch (error) {
+          console.log("Error: ", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        dispatch(
+          updatePostByIdAsync({
+            id: id,
+            avatar: selectedAvatarUpdate,
+            name: nameUpdate,
+            description: descriptionUpdate,
+            image: selectedImageUpdate,
+          })
+        );
+      }
+
       dispatch(getAllPostAsync());
       setOpen(false);
       window.location.reload();
@@ -272,7 +301,11 @@ const PostItem = ({
                   id="avatar-name"
                   className="modal-upload__avatar__label__name"
                 >
-                  {isAvatarPickedUpdate === true
+                  {typeof selectedAvatarUpdate === "string"
+                    ? selectedAvatarUpdate
+                        .substring(selectedAvatarUpdate.lastIndexOf("/"))
+                        .substring(1)
+                    : isAvatarPickedUpdate === true
                     ? selectedAvatarUpdate.name
                     : "Upload image"}
                 </span>
@@ -356,7 +389,11 @@ const PostItem = ({
             <hr className="divider" />
             <div className="options">
               <button onClick={onSubmit} className="btn btn-update">
-                Update
+                {isLoading ? (
+                  <CircularProgress style={{ width: "20px", height: "20px" }} />
+                ) : (
+                  "Update"
+                )}
               </button>
               <button
                 onClick={handleClose}

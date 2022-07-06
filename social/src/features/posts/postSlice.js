@@ -1,99 +1,13 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-const API_URL = "http://192.168.0.119:8800/api";
-// const API_URL = "http://localhost:8800/api";
-export const createPostAsync = createAsyncThunk(
-  "posts/createPostAsync",
-  async (payload) => {
-    console.log("PAYLOAD: ", payload);
-    const res = await fetch(`${API_URL}/posts`, {
-      method: "POST",
-      // mode: "no-cors",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: payload.name,
-        description: payload.description,
-        image: payload.image,
-        avatar: payload.avatar,
-      }),
-    });
-    if (res.ok) {
-      const post = await res.json();
-      return { post };
-    }
-  }
-);
+import { createSlice } from "@reduxjs/toolkit";
 
-export const getAllPostAsync = createAsyncThunk(
-  "posts/getAllPostAsync",
-  async () => {
-    const res = await fetch(`${API_URL}/posts`);
-    if (res.ok) {
-      const posts = await res.json();
-      return { posts };
-    }
-  }
-);
-
-export const deletePostAsync = createAsyncThunk(
-  "delete/deletePostAsync",
-  async (payload) => {
-    const res = await fetch(`${API_URL}/posts/${payload.id}`, {
-      method: "DELETE",
-    });
-    if (res.ok) {
-      return { id: payload.id };
-    }
-  }
-);
-
-export const revertPostAsync = createAsyncThunk(
-  "revert/revertPostAsync",
-  async (payload) => {
-    const res = await fetch(`${API_URL}/posts/`, {
-      method: "PATCH",
-    });
-    if (res.ok) {
-      return "{ id: payload.id };";
-    }
-  }
-);
-
-export const getPostByIdAsync = createAsyncThunk(
-  "posts/getPostByIdAsync",
-  async (payload) => {
-    const res = await fetch(`${API_URL}/posts/${payload.id}`);
-    if (res.ok) {
-      const post = await res.json();
-      return post;
-    }
-  }
-);
-
-export const updatePostByIdAsync = createAsyncThunk(
-  "posts/updatePostAsync",
-  async (payload) => {
-    const res = await fetch(`${API_URL}/posts/${payload.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: payload.nameUpdate,
-        description: payload.descriptionUpdate,
-        likes: payload.likes,
-        content: payload.content,
-        image: payload.image,
-        avatar: payload.avatar,
-      }),
-    });
-    if (res.ok) {
-      const post = await res.json();
-      return { post };
-    }
-  }
-);
+import {
+  createPostAsync,
+  getAllPostAsync,
+  getPostByIdAsync,
+  deletePostAsync,
+  updatePostByIdAsync,
+  revertPostAsync,
+} from "../api/ActionPostAsync";
 
 const postSlice = createSlice({
   name: "posts",
@@ -155,10 +69,12 @@ const postSlice = createSlice({
       return action.payload.posts;
     },
     [revertPostAsync.fulfilled]: (state, action) => {
-      return 0;
+      // state.posts = action.payload.posts;
+      state.searchs = action.payload.posts;
     },
   },
 });
+
 export const {
   addPost,
   deletePost,
@@ -166,6 +82,7 @@ export const {
   revertItemDeletedById,
   findPostByNameAndDescription,
 } = postSlice.actions;
+
 export const findAllPosts = (state) => state.posts.posts;
 
 export const findPostById = (state) => state.posts.postDetail;

@@ -20,30 +20,36 @@ export function validateCreatePost(...fields) {
       .getElementById("upload-avatar__file")
       .classList.add("modal-upload__avatar__file__invalid");
   } else {
-    if (!REGEX_IMAGE.exec(".".concat(fields[INPUT_AVATAR].type.substring(6)))) {
-      alert(
-        "Please upload avatar file having extensions .jpeg/.jpg/.png/ only."
-      );
-      document
-        .getElementById("avatar-name")
-        .classList.add("modal-upload__avatar__label__name__invalid");
-      document
-        .getElementById("label-avatar")
-        .classList.add("modal-avatar-invalid");
-      document
-        .getElementById("upload-avatar__file")
-        .classList.add("modal-upload__avatar__file__invalid");
-      validAvatar = false;
+    if (typeof fields[INPUT_AVATAR] !== "string") {
+      if (
+        !REGEX_IMAGE.exec(".".concat(fields[INPUT_AVATAR].type.substring(6)))
+      ) {
+        alert(
+          "Please upload avatar file having extensions .jpeg/.jpg/.png/ only."
+        );
+        document
+          .getElementById("avatar-name")
+          .classList.add("modal-upload__avatar__label__name__invalid");
+        document
+          .getElementById("label-avatar")
+          .classList.add("modal-avatar-invalid");
+        document
+          .getElementById("upload-avatar__file")
+          .classList.add("modal-upload__avatar__file__invalid");
+        validAvatar = false;
+      } else {
+        document
+          .getElementById("label-avatar")
+          .classList.remove("modal-avatar-invalid");
+        document
+          .getElementById("upload-avatar__file")
+          .classList.remove("modal-upload__avatar__file__invalid");
+        document
+          .getElementById("avatar-name")
+          .classList.remove("modal-upload__avatar__label__name__invalid");
+        validAvatar = true;
+      }
     } else {
-      document
-        .getElementById("label-avatar")
-        .classList.remove("modal-avatar-invalid");
-      document
-        .getElementById("upload-avatar__file")
-        .classList.remove("modal-upload__avatar__file__invalid");
-      document
-        .getElementById("avatar-name")
-        .classList.remove("modal-upload__avatar__label__name__invalid");
       validAvatar = true;
     }
   }

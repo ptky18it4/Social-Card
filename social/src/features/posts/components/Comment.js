@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { validateCreateComment } from "../../helper/validate";
-import { getAllPostAsync, updatePostByIdAsync } from "../postSlice";
+import {
+  getAllPostAsync,
+  updatePostByIdAsync,
+} from "../../api/ActionPostAsync";
 
 const Comment = () => {
   const [content, setContent] = useState("");

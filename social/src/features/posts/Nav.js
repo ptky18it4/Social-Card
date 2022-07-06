@@ -3,25 +3,22 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import IconSearch from "../../images/search-solid.png";
 import axios from "axios";
+import { findPostByNameAndDescription } from "./postSlice";
 import {
-  addPost,
-  findPostByNameAndDescription,
+  createPostAsync,
   getAllPostAsync,
-  revertItemDeleted,
   revertPostAsync,
-} from "./postSlice";
+} from "../api/ActionPostAsync";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import PropTypes from "prop-types";
-import FileBase64 from "react-file-base64";
 
 // web.cjs is required for IE11 support
 import { useState } from "react";
 import { animated, useSpring } from "react-spring";
-import { createPostAsync } from "./postSlice";
 import { validateCreatePost } from "../helper/validate";
-import { toBase64 } from "../helper/toBase64";
+import { CircularProgress } from "@mui/material";
 const Fade = React.forwardRef(function Fade(props, ref) {
   const { in: open, children, onEnter, onExited, ...other } = props;
   const style = useSpring({
@@ -69,6 +66,7 @@ const style = {
 const Nav = () => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState("");
@@ -76,12 +74,13 @@ const Nav = () => {
   const [selectedImage, setSelectedImage] = useState("");
   const [isImagePicked, setIsImagePicked] = useState(false);
   const [search, setSearch] = useState("");
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
   };
   const handleRevert = () => {
-    dispatch(revertItemDeleted());
+    // dispatch(revertItemDeleted());
     dispatch(revertPostAsync());
     window.location.reload();
   };
@@ -106,7 +105,7 @@ const Nav = () => {
 
   const handleOnChangeSearch = (e) => {
     setSearch(e.target.value);
-    dispatch(findPostByNameAndDescription(search));
+    dispatch(findPostByNameAndDescription(e.target.value));
   };
 
   const clearState = () => {
@@ -136,39 +135,53 @@ const Nav = () => {
       alert("Bạn trẻ vui lòng nhập đầy đủ hộ tôi 😜");
     } else {
       alert("OKE RỒI NHEN BẠN TRẺ 😜");
-      const [resAvatar, resImage] = await Promise.all([
-        axios.post(
-          "https://api.cloudinary.com/v1_1/fast-boy-reliable/upload",
-          formDataAvatar,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        ),
-        axios.post(
-          "https://api.cloudinary.com/v1_1/fast-boy-reliable/upload",
-          formDataImage,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        ),
-      ]);
-      dispatch(
-        createPostAsync({
-          avatar: resAvatar.data.url,
-          name: name,
-          description: description,
-          image: resImage.data.url,
-        })
-      );
-      dispatch(getAllPostAsync());
-      setOpen(false);
-      window.location.reload();
-      // console.log("AVATAR: ", resAvatar.data.url);
-      // console.log("AVATAR: ", resImage.data.url);
+      try {
+        setIsLoading(true);
+        const resImage = await axios
+          .post(
+            "https://api.cloudinary.com/v1_1/fast-boy-reliable/upload",
+            formDataImage,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          )
+          .catch((e) => {
+            console.error("Error upload image: ", e);
+          });
+
+        const resAvatar = await axios
+          .post(
+            "https://api.cloudinary.com/v1_1/fast-boy-reliable/upload",
+            formDataAvatar,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          )
+          .catch((e) => {
+            console.error("Error upload avatar: ", e);
+          });
+
+        dispatch(
+          createPostAsync({
+            avatar: resAvatar.data.url,
+            name: name,
+            description: description,
+            image: resImage ? resImage.data.url : "",
+          })
+        );
+        dispatch(getAllPostAsync());
+        setOpen(false);
+      } catch (error) {
+        console.log("Error: ", error);
+      } finally {
+        setIsLoading(false);
+        clearState();
+        dispatch(getAllPostAsync());
+      }
     }
   };
 
@@ -344,7 +357,11 @@ const Nav = () => {
             <hr className="divider" />
             <div className="options">
               <button onClick={onSubmit} className="btn btn-save">
-                Save
+                {isLoading ? (
+                  <CircularProgress style={{ width: "20px", height: "20px" }} />
+                ) : (
+                  "Save"
+                )}
               </button>
               <button
                 onClick={handleCancel}
