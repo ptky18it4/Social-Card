@@ -1,4 +1,3 @@
-import React from "react";
 import EmptyImage from "../../../images/image-empty.svg";
 
 const Empty = () => {

@@ -1,14 +1,19 @@
-import React from "react";
-import socketClient from "socket.io-client";
-import { API_URL } from "../../constants/constants";
+import React, { useState, useEffect } from "react";
+import socketIOClient from "socket.io-client";
+import { SOCKET_URL } from "../../constants/constants";
 const Test = () => {
-  var socket = socketClient(API_URL);
-  socket.on("connection", () => {
-    console.log(`I'm connected with the back-end`);
-  });
+  const [response, setResponse] = useState("");
+  useEffect(() => {
+    const socket = socketIOClient(`${SOCKET_URL}`);
+    socket.on("FromAPI", (data) => {
+      setResponse(data);
+    });
+  }, []);
   return (
     <div>
-      <h1>TEST</h1>
+      <h1>
+        It's <span dateTime={response}>{response}</span>
+      </h1>
     </div>
   );
 };

@@ -34,7 +34,6 @@
     justify-self: flex-end;
     margin-bottom: 20px;
     margin-top: 40px;
-
     &__file {
       background-image: url("../images/upload-solid-blue.svg");
     }
@@ -44,20 +43,24 @@
       }
     }
     &__label__name {
-      width: 300px;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      margin-left: 11px;
       color: $--black;
+      display: inline;
       font-size: 16px;
       line-height: 21px;
+      margin-left: 11px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     &__label__name__invalid {
       color: $--pink;
     }
   }
   &-upload-input__avatar {
+    white-space: nowrap;
     transform: translateY(1px);
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   &-input__avatar {
@@ -65,7 +68,6 @@
     opacity: 0;
     position: absolute;
     transform: translateY(1px);
-
     z-index: -1;
   }
   &-image {
@@ -96,9 +98,10 @@
     }
   }
   &-upload-input__image {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    white-space: nowrap;
+    transform: translateY(1px);
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   &-input__image {

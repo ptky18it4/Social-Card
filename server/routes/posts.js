@@ -31,9 +31,9 @@ router.put("/:id", async (req, res) => {
           comment: [{ content: req.body.content }],
         },
       });
-      // const posts = await Post.find({});
-      // res.status(200).json(posts);
-      res.status(200).json("the post has been updated");
+      const posts = await Post.find({});
+      res.status(200).json(posts);
+      // res.status(200).json("the post has been updated");
     } else {
       await post.updateOne({
         $set: req.body,
@@ -51,6 +51,28 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// revert for add
+router.delete("/lasted", async (req, res) => {
+  try {
+    const post = await Post.findOne().sort({ createdAt: -1 }).limit(1);
+    await post.deleteOne();
+    res.status(200).json("The post has been deleted");
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+//revert for delete
+router.patch("/delete", async (req, res) => {
+  try {
+    const post = await Post.findOne().sort({ deletedAt: -1 }).limit(1);
+    await post.restore();
+    res.status(200).json("The post has been deleted");
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 //delete a post
 router.delete("/:id", async (req, res) => {
   if (req.params.id) {
@@ -61,19 +83,6 @@ router.delete("/:id", async (req, res) => {
     } catch (err) {
       res.status(500).json(err);
     }
-  }
-});
-
-//revert
-router.patch("/", async (req, res) => {
-  try {
-    const post = await Post.findOne().sort({ deletedAt: -1 }).limit(1);
-    await post.restore();
-    res.status(200).json("The post has been deleted");
-    // const posts = await Post.find({});
-    // res.status(200).json(posts);
-  } catch (err) {
-    res.status(500).json(err);
   }
 });
 

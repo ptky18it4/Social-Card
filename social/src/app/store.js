@@ -1,4 +1,4 @@
-import { configureStore, applyMiddleware } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import postReducer from "../features/posts/postSlice";
 export const store = configureStore({
   reducer: {

@@ -1,24 +1,30 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React from "react";
-import { useDispatch } from "react-redux";
-import IconSearch from "../../images/search-solid.png";
-import axios from "axios";
-import { findPostByNameAndDescription } from "./postSlice";
-import {
-  createPostAsync,
-  getAllPostAsync,
-  revertPostAsync,
-} from "../api/ActionPostAsync";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
+import axios from "axios";
 import PropTypes from "prop-types";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import IconSearch from "../../images/search-solid.png";
+import {
+  addStateAsync,
+  createPostAsync,
+  getAllPostAsync,
+  getStateAsync,
+  removeStateAsync,
+  revertCreatePostAsync,
+  revertDeletePostAsync,
+} from "../api/ActionPostAsync";
+import { findPostByNameAndDescription, revertPost } from "./postSlice";
 
 // web.cjs is required for IE11 support
+import { CircularProgress } from "@mui/material";
 import { useState } from "react";
 import { animated, useSpring } from "react-spring";
+import { STATE_ADD } from "../../constants/constants";
 import { validateCreatePost } from "../helper/validate";
-import { CircularProgress } from "@mui/material";
+import { STATE_DELETE } from "./../../constants/constants";
 const Fade = React.forwardRef(function Fade(props, ref) {
   const { in: open, children, onEnter, onExited, ...other } = props;
   const style = useSpring({
@@ -74,15 +80,10 @@ const Nav = () => {
   const [selectedImage, setSelectedImage] = useState("");
   const [isImagePicked, setIsImagePicked] = useState(false);
   const [search, setSearch] = useState("");
-
+  const currentState = useSelector((state) => state.posts.revert.at(-1));
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
-  };
-  const handleRevert = () => {
-    // dispatch(revertItemDeleted());
-    dispatch(revertPostAsync());
-    window.location.reload();
   };
 
   const handleOnChangeName = (e) => {
@@ -120,6 +121,26 @@ const Nav = () => {
   const handleCancel = () => {
     setOpen(false);
     clearState();
+  };
+
+  const handleRevert = () => {
+    dispatch(getStateAsync());
+    if (currentState === STATE_ADD) {
+      dispatch(revertCreatePostAsync());
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } else if (currentState === STATE_DELETE) {
+      dispatch(revertDeletePostAsync());
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } else if (currentState === undefined) {
+      alert("Còn gì nữa đâu mà revert ☺️");
+    }
+    dispatch(removeStateAsync());
+    dispatch(getAllPostAsync());
+    dispatch(getStateAsync());
   };
 
   const formDataAvatar = new FormData();
@@ -173,6 +194,17 @@ const Nav = () => {
             image: resImage ? resImage.data.url : "",
           })
         );
+        dispatch(
+          revertPost({
+            status: STATE_DELETE,
+          })
+        );
+        dispatch(
+          addStateAsync({
+            status: STATE_ADD,
+          })
+        );
+
         dispatch(getAllPostAsync());
         setOpen(false);
       } catch (error) {
@@ -181,8 +213,12 @@ const Nav = () => {
         setIsLoading(false);
         clearState();
         dispatch(getAllPostAsync());
+        dispatch(getStateAsync());
       }
     }
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   return (

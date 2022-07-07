@@ -1,12 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import {
+  addStateAsync,
   createPostAsync,
+  deletePostAsync,
   getAllPostAsync,
   getPostByIdAsync,
-  deletePostAsync,
+  getStateAsync,
+  removeStateAsync,
+  revertCreatePostAsync,
+  revertDeletePostAsync,
   updatePostByIdAsync,
-  revertPostAsync,
 } from "../api/ActionPostAsync";
 
 const postSlice = createSlice({
@@ -17,6 +21,7 @@ const postSlice = createSlice({
     newlyAdded: [],
     searchs: [],
     postDetail: {},
+    revert: [],
   },
   reducers: {
     addPost: (state, action) => {
@@ -27,11 +32,15 @@ const postSlice = createSlice({
       const index = state.searchs.findIndex(function (i) {
         return i._id === action.payload.id;
       });
-      if (index !== -1) {
-        let itemDeleted = JSON.parse(
-          JSON.stringify(state.searchs.splice(index, 1))
-        );
-        state.deleted.push(...itemDeleted);
+      try {
+        if (index !== -1) {
+          let itemDeleted = JSON.parse(
+            JSON.stringify(state.searchs.splice(index, 1))
+          );
+          state.deleted.push(...itemDeleted);
+        }
+      } catch (e) {
+        console.log("Error deleted store");
       }
     },
     revertItemDeleted: (state, action) => {
@@ -49,13 +58,16 @@ const postSlice = createSlice({
       );
       state.searchs = result;
     },
+    revertPost: (state, action) => {
+      state.revert.push(action.payload.status);
+    },
   },
   extraReducers: {
     [createPostAsync.fulfilled]: (state, action) => {
       return action.payload.posts;
     },
     [getAllPostAsync.fulfilled]: (state, action) => {
-      state.posts = action.payload.posts;
+      // state.posts = action.payload.posts;
       state.searchs = action.payload.posts;
     },
     [getPostByIdAsync.fulfilled]: (state, action) => {
@@ -68,9 +80,22 @@ const postSlice = createSlice({
     [updatePostByIdAsync.fulfilled]: (state, action) => {
       return action.payload.posts;
     },
-    [revertPostAsync.fulfilled]: (state, action) => {
+    [revertDeletePostAsync.fulfilled]: (state, action) => {
       // state.posts = action.payload.posts;
       state.searchs = action.payload.posts;
+    },
+    [revertCreatePostAsync.fulfilled]: (state, action) => {
+      // state.posts = action.payload.posts;
+      state.searchs = action.payload.posts;
+    },
+    [getStateAsync.fulfilled]: (state, action) => {
+      state.revert = action.payload.state[0].status;
+    },
+    [addStateAsync.fulfilled]: (state, action) => {
+      state.revert = action.payload.state;
+    },
+    [removeStateAsync.fulfilled]: (state, action) => {
+      state.revert = action.payload.states;
     },
   },
 });
@@ -81,12 +106,13 @@ export const {
   revertItemDeleted,
   revertItemDeletedById,
   findPostByNameAndDescription,
+  revertPost,
 } = postSlice.actions;
 
 export const findAllPosts = (state) => state.posts.posts;
 
 export const findPostById = (state) => state.posts.postDetail;
-
 export const findPostsDeleted = (state) => state.posts.deleted;
 export const findSearchList = (state) => state.posts.searchs;
+
 export default postSlice.reducer;

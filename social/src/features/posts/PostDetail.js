@@ -2,21 +2,17 @@
 /* eslint-disable no-const-assign */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import PostDetailImage from "../../images/Image 1@2x.png";
 
-import IconHeart from "../../images/heart-solid.svg";
-import IconMessage from "../../images/message-solid.svg";
-import Comment from "./components/Comment";
-import { useParams } from "react-router-dom";
-import { findPostById } from "./postSlice";
-import {
-  getAllPostAsync,
-  getPostByIdAsync,
-  updatePostByIdAsync,
-} from "../api/ActionPostAsync";
 import { format } from "date-format-parse";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import IconHeart from "../../images/heart-solid.svg";
+import IconMessage from "../../images/message-solid.svg";
+import { getPostByIdAsync, updatePostByIdAsync } from "../api/ActionPostAsync";
+import Comment from "./components/Comment";
+import { findPostById } from "./postSlice";
 
 const PostDetail = () => {
   const params = useParams();

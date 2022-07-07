@@ -1,29 +1,31 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
+import Backdrop from "@mui/material/Backdrop";
+import Box from "@mui/material/Box";
+import Modal from "@mui/material/Modal";
+import axios from "axios";
+import { format } from "date-format-parse";
+import PropTypes from "prop-types";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import ImageDefault from "../../../images/Image 1.png";
 import IconPen from "../../../images/pencil-alt-solid.svg";
 import IconTrash from "../../../images/trash-alt-regular.svg";
 import IconTrashModal from "../../../images/trash-can-regular.svg";
-import PropTypes from "prop-types";
-import Backdrop from "@mui/material/Backdrop";
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
 import UploadImage from "../../../images/upload-solid-blue.svg";
-import { format } from "date-format-parse";
-import axios from "axios";
-import { deletePost } from "../postSlice";
 import {
+  addStateAsync,
   deletePostAsync,
   getAllPostAsync,
+  getStateAsync,
   updatePostByIdAsync,
 } from "../../api/ActionPostAsync";
-import { useDispatch } from "react-redux";
+import { deletePost, revertPost } from "../postSlice";
 // web.cjs is required for IE11 support
-import { useSpring, animated } from "react-spring";
-import { Link } from "react-router-dom";
-import { validateCreatePost } from "../../helper/validate";
-import { toBase64 } from "../../helper/toBase64";
 import { CircularProgress } from "@mui/material";
+import { Link } from "react-router-dom";
+import { animated, useSpring } from "react-spring";
+import { STATE_DELETE } from "../../../constants/constants";
+import { validateCreatePost } from "../../helper/validate";
 
 const Fade = React.forwardRef(function Fade(props, ref) {
   const { in: open, children, onEnter, onExited, ...other } = props;
@@ -99,10 +101,17 @@ const PostItem = ({
   const [selectedAvatarUpdate, setSelectedAvatarUpdate] = useState(avatar);
   useState();
   const [isAvatarPickedUpdate, setIsAvatarPickedUpdate] = useState(false);
-  const [selectedImageUpdate, setSelectedImageUpdate] = useState();
-  useState();
+  const [selectedImageUpdate, setSelectedImageUpdate] = useState(image);
   const [isImagePickedUpdate, setIsImagePickedUpdate] = useState(false);
 
+  const resetState = () => {
+    setSelectedAvatarUpdate(avatar);
+    setIsAvatarPickedUpdate(false);
+    setSelectedImageUpdate(image);
+    setIsImagePickedUpdate(false);
+    setNameUpdate(name);
+    setDescriptionUpdate(description);
+  };
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleAlertDelete = () => setAlertDelete(true);
@@ -116,7 +125,22 @@ const PostItem = ({
     e.preventDefault();
     dispatch(deletePost({ id: id }));
     dispatch(deletePostAsync({ id: id }));
+    dispatch(
+      revertPost({
+        status: STATE_DELETE,
+      })
+    );
+    dispatch(
+      addStateAsync({
+        status: STATE_DELETE,
+      })
+    );
     handleCloseAlertDelete();
+    setTimeout(() => {
+      // window.location.reload();
+      dispatch(getAllPostAsync());
+      dispatch(getStateAsync());
+    }, 500);
   };
 
   const handleOnChangeName = (e) => {
@@ -135,6 +159,10 @@ const PostItem = ({
   const handleOnChangeImage = (e) => {
     setSelectedImageUpdate(e.target.files[0]);
     setIsImagePickedUpdate(true);
+  };
+  const handleCancel = () => {
+    setOpen(false);
+    resetState();
   };
   const formDataAvatar = new FormData();
   formDataAvatar.append("upload_preset", "social");
@@ -372,7 +400,12 @@ const PostItem = ({
               >
                 <img src={UploadImage} alt="" />
                 <span>
-                  {isImagePickedUpdate === true
+                  {typeof selectedImageUpdate === "string" &&
+                  selectedImageUpdate !== ""
+                    ? selectedImageUpdate
+                        .substring(selectedImageUpdate.lastIndexOf("/"))
+                        .substring(1)
+                    : isImagePickedUpdate === true
                     ? selectedImageUpdate.name
                     : "Upload image"}
                 </span>
@@ -396,7 +429,7 @@ const PostItem = ({
                 )}
               </button>
               <button
-                onClick={handleClose}
+                onClick={handleCancel}
                 className="btn btn-cancel btn-disable"
               >
                 Cancel
