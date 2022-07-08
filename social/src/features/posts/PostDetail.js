@@ -23,6 +23,12 @@ const PostDetail = () => {
     dispatch(getPostByIdAsync({ id: params.id }));
   }, [dispatch]);
 
+  const onRefresh = () => {
+    if (post.deleted === true) {
+      window.location.href = "http://192.168.0.119:3000";
+    }
+  };
+  onRefresh();
   const handleReaction = () => {
     setReaction(post.likes + 1);
     dispatch(updatePostByIdAsync({ id: params.id, likes: post.likes + 1 }));
@@ -39,7 +45,7 @@ const PostDetail = () => {
             src={
               post.avatar
                 ? post.avatar
-                : "https://scontent.fdad1-3.fna.fbcdn.net/v/t39.30808-6/282107071_3097124107283687_4114854076538189931_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=V5cjnhQFlwkAX_fZr6i&tn=55OHL7t1G0gtDlXP&_nc_ht=scontent.fdad1-3.fna&oh=00_AT-wmezovc-2vLbiLjGEvcxw39lV00Kx-hfoebU6EmkUfQ&oe=62C0932B"
+                : "http://mediation-mitrovica.org/wp-content/uploads/2018/06/image-blank.jpg"
             }
             alt=""
           />
@@ -92,7 +98,7 @@ const PostDetail = () => {
             <></>
           )}
         </div>
-        <Comment />
+        <Comment deleted={post.deleted} />
       </div>
     </div>
   );

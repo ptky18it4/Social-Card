@@ -138,8 +138,8 @@ const PostItem = ({
     handleCloseAlertDelete();
     setTimeout(() => {
       // window.location.reload();
-      dispatch(getAllPostAsync());
-      dispatch(getStateAsync());
+      // dispatch(getAllPostAsync());
+      // dispatch(getStateAsync());
     }, 500);
   };
 
@@ -234,9 +234,9 @@ const PostItem = ({
         );
       }
 
-      dispatch(getAllPostAsync());
+      // dispatch(getAllPostAsync());
       setOpen(false);
-      window.location.reload();
+      // window.location.reload();
     }
   };
 

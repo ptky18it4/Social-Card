@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import axios from "axios";
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import IconSearch from "../../images/search-solid.png";
 import {
@@ -22,9 +22,10 @@ import { findPostByNameAndDescription, revertPost } from "./postSlice";
 import { CircularProgress } from "@mui/material";
 import { useState } from "react";
 import { animated, useSpring } from "react-spring";
-import { STATE_ADD } from "../../constants/constants";
 import { validateCreatePost } from "../helper/validate";
-import { STATE_DELETE } from "./../../constants/constants";
+import { STATE_DELETE, STATE_ADD } from "./../../constants/constants";
+import { io } from "socket.io-client";
+
 const Fade = React.forwardRef(function Fade(props, ref) {
   const { in: open, children, onEnter, onExited, ...other } = props;
   const style = useSpring({
@@ -81,6 +82,15 @@ const Nav = () => {
   const [isImagePicked, setIsImagePicked] = useState(false);
   const [search, setSearch] = useState("");
   const currentState = useSelector((state) => state.posts.revert.at(-1));
+
+  const formDataAvatar = new FormData();
+  formDataAvatar.append("upload_preset", "social");
+  formDataAvatar.append("file", selectedAvatar);
+
+  const formDataImage = new FormData();
+  formDataImage.append("upload_preset", "social");
+  formDataImage.append("file", selectedImage);
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
@@ -143,14 +153,6 @@ const Nav = () => {
     dispatch(getStateAsync());
   };
 
-  const formDataAvatar = new FormData();
-  formDataAvatar.append("upload_preset", "social");
-  formDataAvatar.append("file", selectedAvatar);
-
-  const formDataImage = new FormData();
-  formDataImage.append("upload_preset", "social");
-  formDataImage.append("file", selectedImage);
-
   const onSubmit = async () => {
     if (!validateCreatePost(selectedAvatar, name, description)) {
       alert("Bạn trẻ vui lòng nhập đầy đủ hộ tôi 😜");
@@ -205,20 +207,20 @@ const Nav = () => {
           })
         );
 
-        dispatch(getAllPostAsync());
+        // dispatch(getAllPostAsync());
         setOpen(false);
       } catch (error) {
         console.log("Error: ", error);
       } finally {
         setIsLoading(false);
         clearState();
-        dispatch(getAllPostAsync());
-        dispatch(getStateAsync());
+        // dispatch(getAllPostAsync());
+        // dispatch(getStateAsync());
       }
     }
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
+    // setTimeout(() => {
+    //   window.location.reload();
+    // }, 500);
   };
 
   return (

@@ -13,6 +13,12 @@ router.post("/", async (req, res, next) => {
 
   try {
     const savedPost = await newPost.save();
+    const posts = await Post.find({});
+    try {
+      io.emit("post-created", posts);
+    } catch (error) {
+      console.log("[ERROR]:[EMIT]- ", error);
+    }
     res.status(200).json(savedPost);
   } catch (err) {
     res.status(500).json(err);
@@ -32,19 +38,22 @@ router.put("/:id", async (req, res) => {
         },
       });
       const posts = await Post.find({});
-      res.status(200).json(posts);
-      // res.status(200).json("the post has been updated");
+      io.emit("post-updated", posts);
+      res.status(200).json(post);
     } else {
       await post.updateOne({
         $set: req.body,
       });
-      // const posts = await Post.find({});
-      // res.status(200).json(posts);
+      const posts = await Post.find({});
+      io.emit("post-updated", posts);
       res.status(200).json("the post has been updated");
     }
-
-    // } else {
-    // res.status(403).json("you can update only your post");
+    // const posts = await Post.find({});
+    // try {
+    // io.emit("post-updated", posts);
+    // console.log("Update");
+    // } catch (error) {
+    //   console.log("[ERROR]:[EMIT]- ", error);
     // }
   } catch (err) {
     res.status(500).json(err);
@@ -56,6 +65,13 @@ router.delete("/lasted", async (req, res) => {
   try {
     const post = await Post.findOne().sort({ createdAt: -1 }).limit(1);
     await post.deleteOne();
+    const posts = await Post.find({});
+    try {
+      io.emit("revert-added", posts);
+    } catch (error) {
+      console.log("[ERROR]:[EMIT]- ", error);
+    }
+
     res.status(200).json("The post has been deleted");
   } catch (err) {
     res.status(500).json(err);
@@ -67,6 +83,12 @@ router.patch("/delete", async (req, res) => {
   try {
     const post = await Post.findOne().sort({ deletedAt: -1 }).limit(1);
     await post.restore();
+    const posts = await Post.find({});
+    try {
+      io.emit("revert-deleted", posts);
+    } catch (error) {
+      console.log("[ERROR]:[EMIT]- ", error);
+    }
     res.status(200).json("The post has been deleted");
   } catch (err) {
     res.status(500).json(err);
@@ -79,6 +101,12 @@ router.delete("/:id", async (req, res) => {
     try {
       // const post = await Post.findById(req.params.id);
       await Post.delete({ _id: req.params.id });
+      const posts = await Post.find({});
+      try {
+        io.emit("post-deleted", posts);
+      } catch (error) {
+        console.log("[ERROR]:[EMIT]- ", error);
+      }
       res.status(200).json("The post has been deleted");
     } catch (err) {
       res.status(500).json(err);

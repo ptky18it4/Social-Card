@@ -1,7 +1,12 @@
+import { useSelect } from "@mui/base";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { updatePostByIdAsync } from "../../api/ActionPostAsync";
+import {
+  getAllPostAsync,
+  getPostByIdAsync,
+  updatePostByIdAsync,
+} from "../../api/ActionPostAsync";
 import { validateCreateComment } from "../../helper/validate";
 
 const Comment = () => {
@@ -12,12 +17,18 @@ const Comment = () => {
     setContent(event.target.value);
   };
 
-  const handleComment = () => {
+  const handleComment = async () => {
+    dispatch(getPostByIdAsync({ id: params.id }));
     if (!validateCreateComment(content)) {
       alert("Bạn trẻ nhập comment hộ tôi 😜");
     } else {
       dispatch(updatePostByIdAsync({ id: params.id, content: content }));
       setContent("");
+      dispatch(
+        getPostByIdAsync({
+          id: params.id,
+        })
+      );
       window.location.reload();
     }
   };
